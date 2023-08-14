@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import os
 import random
+import csv
 
 # Define the genetic algorithm parameters
 num_genes = 5
@@ -17,7 +18,7 @@ def load_base_input_file(file_path):
 
 def export_modified_input_file(modified_content, generation, child_index):
     output_folder = output_folder_entry.get()
-    output_file_name = f"modified_{generation}_{child_index}.txt"
+    output_file_name = f"modified_{generation}_{child_index}.asset"
     output_file_path = os.path.join(output_folder, output_file_name)
     with open(output_file_path, 'w') as file:
         file.write(modified_content)
@@ -36,16 +37,44 @@ def modify_input_content(content, genes):
         modified_content = modified_content.replace(placeholder, str(gene))
     return modified_content
 
+def read_laptimes_from_csv(csv_path):
+    lap_times = []
+    with open(csv_path, 'r') as csv_file:
+        reader = csv.reader(csv_file)
+        next(reader)  # Skip header
+        for row in reader:
+            lap_times.append(float(row[0]))
+    return lap_times
+
 def run_genetic_algorithm():
     base_input_file = input_file_entry.get()
 
     for generation in range(num_generations):
-        for child_index in range(num_children):
-            genes = initialize_individual()
-            genes = [round(gene, 2) for gene in genes]  # Round to two decimal places
-            input_content = load_base_input_file(base_input_file)
-            modified_content = modify_input_content(input_content, genes)
-            export_modified_input_file(modified_content, generation, child_index)
+        if generation == 0:
+            for child_index in range(num_children):
+                genes = initialize_individual()
+                genes = [round(gene, 2) for gene in genes]  # Round to two decimal places
+                input_content = load_base_input_file(base_input_file)
+                modified_content = modify_input_content(input_content, genes)
+                export_modified_input_file(modified_content, generation, child_index)
+        else:
+            csv_path = laptime_csv_entry.get()
+            lap_times = read_laptimes_from_csv(csv_path)
+            fastest_indices = sorted(range(len(lap_times)), key=lambda i: lap_times[i])[:2]
+            
+            for child_index in range(num_children):
+                if child_index < 2:
+                    # Use the genes from the fastest children
+                    genes = populations[generation - 1][fastest_indices[child_index]]
+                else:
+                    # Generate new children using genetic algorithm
+                    genes = initialize_individual()
+                genes = [round(gene, 2) for gene in genes]  # Round to two decimal places
+                input_content = load_base_input_file(base_input_file)
+                modified_content = modify_input_content(input_content, genes)
+                export_modified_input_file(modified_content, generation, child_index)
+                
+                populations[generation].append(genes)
 
 # Create the main window
 root = tk.Tk()
@@ -65,6 +94,20 @@ def browse_input_file():
 browse_input_button = tk.Button(root, text="Browse", command=browse_input_file)
 browse_input_button.pack()
 
+# Laptime CSV selection
+laptime_csv_label = tk.Label(root, text="Select Laptime CSV File:")
+laptime_csv_label.pack()
+laptime_csv_entry = tk.Entry(root)
+laptime_csv_entry.pack()
+
+def browse_laptime_csv():
+    laptime_csv_path = filedialog.askopenfilename()
+    laptime_csv_entry.delete(0, tk.END)
+    laptime_csv_entry.insert(0, laptime_csv_path)
+
+browse_laptime_csv_button = tk.Button(root, text="Browse", command=browse_laptime_csv)
+browse_laptime_csv_button.pack()
+
 # Output folder entry
 output_folder_label = tk.Label(root, text="Output Folder:")
 output_folder_label.pack()
@@ -74,6 +117,9 @@ output_folder_entry.pack()
 # Run genetic algorithm button
 run_genetic_algorithm_button = tk.Button(root, text="Run Genetic Algorithm", command=run_genetic_algorithm)
 run_genetic_algorithm_button.pack()
+
+# Store populations
+populations = [[] for _ in range(num_generations)]
 
 # Start the main event loop
 root.mainloop()
