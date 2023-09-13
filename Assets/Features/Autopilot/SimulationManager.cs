@@ -14,6 +14,7 @@ public class SimulationManager : MonoBehaviour
 {
     // for asset file stuff
     public Autopilot autopilot;
+    public CrashDetector crashDetector;
     private int maxAssetsPerGeneration = 5;
     public int currentAssetIndex { get; private set; } = 0;
     public int carNumber { get; private set; } = 0;
@@ -39,6 +40,8 @@ public class SimulationManager : MonoBehaviour
         {
             SwitchOutLap();
         }
+        // Subscribe to the crash event
+        crashDetector.OnCrashDetected += CycleToNextAsset;
     }
 
     private void Update()
@@ -101,6 +104,9 @@ public class SimulationManager : MonoBehaviour
 
             // Increment carNumber and wrap it if it goes above 5
             carNumber = (carNumber % maxAssetsPerGeneration) + 1;
+
+            // Log the message here
+            Debug.Log($"Moving to next asset. Current asset index: {currentAssetIndex}, Car number: {carNumber}");
 
             string currentGenerationFolder = folderPaths[currentGenerationIndex];
             string currentAssetFile = System.IO.Path.Combine(currentGenerationFolder, $"gen{currentGenerationNumber}asset{currentAssetIndex}.asset");

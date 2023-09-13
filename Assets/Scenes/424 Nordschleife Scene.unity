@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 0.3
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.044780876, g: 0.05738007, b: 0.070604235, a: 0.3}
+  m_IndirectSpecularColor: {r: 0.04479733, g: 0.057378992, b: 0.07052303, a: 0.3}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -538,6 +538,7 @@ GameObject:
   m_Component:
   - component: {fileID: 410356644}
   - component: {fileID: 410356643}
+  - component: {fileID: 410356645}
   m_Layer: 0
   m_Name: SimulationManager
   m_TagString: Untagged
@@ -558,6 +559,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autopilot: {fileID: 1025270148}
+  crashDetector: {fileID: 410356645}
   genNumberText: {fileID: 1965476351}
   carNumberText: {fileID: 143274269}
 --- !u!4 &410356644
@@ -575,6 +577,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &410356645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410356642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b964d622b7945bd910105243cd61e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crashThreshold: 0.1
+  timeThreshold: 2
 --- !u!1001 &470636970
 PrefabInstance:
   m_ObjectHideFlags: 0
